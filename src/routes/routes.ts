@@ -25,12 +25,9 @@ apiV1Router.use(cookieParser()); // Parsing cookies from the request.
 apiV1Router.use(cors({ ...corsOptions, credentials: true })); // Enabling Cross-Origin Resource Sharing with the specified options.
 
 // Mounting routers
-apiV1Router.use("/api/v1", (req, res, next) => {
+apiV1Router.use("/api/v1", apiV1Router); // Mounting the API v1 router at the "/api/v1" endpoint.
 
-    apiV1Router.use("/login", loginRouter); // Mounting the login router at the "/login" endpoint.
-    apiV1Router.use("/logout", logoutRouter); // Mounting the logout router at the "/logout" endpoint.
-    apiV1Router.use("/refresh", refreshRouter); // Mounting the refresh router at the "/refresh" endpoint.
-    apiV1Router.use("/register", registerRouter); // Mounting the register router at the "/register" endpoint.
-    
-    next();
-});
+apiV1Router.use("/login", loginRouter); // Mounting the login router at the "/login" endpoint.
+apiV1Router.use("/logout", logoutRouter); // Mounting the logout router at the "/logout" endpoint.
+apiV1Router.use("/refresh", refreshRouter); // Mounting the refresh router at the "/refresh" endpoint.
+apiV1Router.use("/register", registerRouter); // Mounting the register router at the "/register" endpoint.

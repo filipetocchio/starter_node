@@ -52,14 +52,14 @@ const register = async (req: Request, res: Response) => {
       },
     });
 
-    // res.cookie("jwt", refreshToken, {
-    //   domain: "http://localhost:4200",
-    //   path: "/",
-    //   httpOnly: true,
-    //   sameSite: "lax",
-    //   secure: true,
-    //   maxAge: 24 * 60 * 60 * 1000,
-    // });
+    res.cookie("jwt", refreshToken, {
+      domain: "http://localhost:4200",
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
 
     const response: RouteResponse<AuthRouteResponse> = {
       success: true,
@@ -82,6 +82,7 @@ const register = async (req: Request, res: Response) => {
       .status(response.code)
       .json(response);
   } catch (error) {
+    console.error(error);
     const response: RouteResponse<null> = {
       code: 500,
       data: null,
