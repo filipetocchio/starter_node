@@ -82,7 +82,7 @@ const register = async (req: Request, res: Response) => {
       .status(response.code)
       .json(response);
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     const response: RouteResponse<null> = {
       code: 500,
       data: null,
