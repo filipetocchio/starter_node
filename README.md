@@ -78,6 +78,16 @@ Let's go through each script and understand what it does:
 
 To execute any of these scripts, open your terminal or integrated terminal in Visual Studio Code, navigate to the project directory where the `package.json` file is located, and run the desired script using the `npm run` command followed by the script name.
 
+## Routes URL's
+
+- 
+
+- 
+
+- 
+
+- `http://localhost:8001/api/v1/refresh`
+
 ## Folder Structure
 - `prisma/`: Directory containing the Prisma schema file defining the database structure.
   - `schema.prisma`: Prisma schema file.

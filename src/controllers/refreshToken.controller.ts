@@ -47,7 +47,7 @@ const refreshToken = async (req: Request, res: Response) => {
 
     // everything is ok so issue and return the new access token
     const accessToken = jwt.sign({ UserInfo: { username: decoded.username } }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "5m",
+      expiresIn: "6h",
     });
     const resp: RouteResponse<AuthRouteResponse> = {
       code: 200,

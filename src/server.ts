@@ -11,7 +11,7 @@ app.use("/api/v1", apiV1Router);
 
 // maybe implement a catch all here
 app.get("/", (req, res) => {
-  res.send("Hello dude");
+  res.send("Hello nodejs!");
 });
 
 app.use(errorHandler);

@@ -2,14 +2,13 @@ import { prisma } from '../utils/prisma';
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { AuthRouteResponse, RouteResponse, registerPayloadSchema } from "../interfaces/interfaces";
+import { AuthRouteResponse, RouteResponse } from "../interfaces/interfaces";
 import { ZodError } from "zod";
 
 
 const register = async (req: Request, res: Response) => {
   try {
     const { username, password, email } = req.body;
-    registerPayloadSchema.parse(req.body);
     // check for duplicate usernames in the db
     const duplicate = await prisma.user.findFirst({
       where: { OR: [{ username: username }, { email: email }] },
@@ -31,12 +30,49 @@ const register = async (req: Request, res: Response) => {
       res.status(response.code).json(response);
       return;
     }
+    
+    // Validate username
+    if (username.length < 1) {
+      const response: RouteResponse<null> = {
+      code: 400,
+      data: null,
+      success: false,
+      error: "Username is a required field.",
+      message: "Username is a required field.",
+      };
+      res.status(response.code).json(response);
+      return;
+    }
+    if (username.length > 20) {
+      const response: RouteResponse<null> = {
+      code: 400,
+      data: null,
+      success: false,
+      error: "Username cannot exceed 20 characters.",
+      message: "Username cannot exceed 20 characters.",
+      };
+      res.status(response.code).json(response);
+      return;
+    }
+
+    // validade password
+    if (password.length < 6) {
+      const response: RouteResponse<null> = {
+      code: 400,
+      data: null,
+      success: false,
+      error: "Password must be at least 6 characters.",
+      message: "Password must be at least 6 characters.",
+      };
+      res.status(response.code).json(response);
+      return;
+    }
 
     const hashedPassword: string = await bcrypt.hash(password, 10);
 
     // create access & refresh token
     const accessToken = jwt.sign({ UserInfo: { username: username } }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "6h",
     });
     const refreshToken = jwt.sign({ username: username }, process.env.REFRESH_TOKEN_SECRET, {
       expiresIn: "1d",
@@ -82,7 +118,7 @@ const register = async (req: Request, res: Response) => {
       .status(response.code)
       .json(response);
   } catch (error) {
-    // console.error(error);
+
     const response: RouteResponse<null> = {
       code: 500,
       data: null,

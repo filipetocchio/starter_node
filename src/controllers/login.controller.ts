@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { ZodError } from "zod";
-import { AuthRouteResponse, RouteResponse, loginPayloadSchema } from "../interfaces/interfaces";
+import { AuthRouteResponse, RouteResponse } from "../interfaces/interfaces";
 
 dotenv.config();
 
@@ -12,7 +12,14 @@ dotenv.config();
 const login = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
-    // loginPayloadSchema.parse(req.body);
+
+  if (!username) {
+      return res.status(422).json({ msg: 'username is required!'});
+  }
+
+  if (!password) {
+      return res.status(422).json({ msg: 'Password is required!'});
+  }
 
     // find the user
     const foundUser = await prisma.user.findFirst({ where: { username: username } });
