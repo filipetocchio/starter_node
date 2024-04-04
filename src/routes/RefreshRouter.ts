@@ -3,4 +3,4 @@ import { refreshToken } from "../controllers/refreshToken.controller";
 
 export const refreshRouter = express.Router();
 
-refreshRouter.get("/", refreshToken);
+refreshRouter.get("/:id", refreshToken);

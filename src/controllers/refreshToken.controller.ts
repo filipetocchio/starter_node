@@ -1,63 +1,69 @@
 import { prisma } from '../utils/prisma';
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import { AuthRouteResponse, RouteResponse } from "../interfaces/interfaces";
 import { Request, Response } from "express";
+import dotenv from "dotenv";
 
 dotenv.config();
+const secretKey = process.env.YOUR_SECRET_KEY;
 
-const refreshToken = async (req: Request, res: Response) => {
-  const cookies = req.cookies;
-  const response: RouteResponse<null> = {
-    code: 401,
-    data: null,
-    success: false,
-    error: "You are not authorized to make this request.",
-    message: "You are not authorized to make this request.",
-  };
+// Controller to generate a new access token using the refresh token
+export const refreshToken = async (req: Request, res: Response) => {
+  try {
+    const userId  = parseInt(req.params.id);  
 
-  // If you dont have a cookie , user must login again.
-  if (!cookies?.jwt) {
-    return res.status(response.code).json(response);
-  }
-  // If you have the cookie get the cookie for further use
-  const refreshToken = cookies.jwt;
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
 
-  // find the user with the associated refreshToken
-  const foundUser = await prisma.user.findFirst({ where: { refreshToken: refreshToken } });
-
-  // if there is no user with this refresh token , user must login again.
-  if (!foundUser) {
-    response.code = 403;
-    response.error = "You are forbidden from making this request";
-    response.message = "You are forbidden from making this request";
-    return res.status(response.code).json(response);
-  }
-
-  // if the refreshToken matches the one stored in the database
-  // try to verify it
-
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-    if (err || foundUser.username !== decoded.username) {
-      response.code = 403;
-      response.error = "You are forbidden from making this request";
-      response.message = "You are forbidden from making this request";
-      return res.status(response.code).json(response);
+    if (!user) {
+      return res.status(404).json({ 
+        code: 404, 
+        success: false, 
+        error: "User not found.", 
+        message: null, 
+        data: null 
+      });
     }
 
-    // everything is ok so issue and return the new access token
-    const accessToken = jwt.sign({ UserInfo: { username: decoded.username } }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "6h",
-    });
-    const resp: RouteResponse<AuthRouteResponse> = {
-      code: 200,
-      success: true,
-      error: null,
-      message: "Token refreshed successfully.",
-      data: { accessToken: accessToken, id: foundUser.id, username: foundUser.username },
-    };
-    res.status(resp.code).json(resp);
-  });
-};
+    if (!user.refreshToken) {
+      return res.status(404).json({ 
+        code: 404, 
+        success: false, 
+        error: "User does not have a refresh token.", 
+        message: null, 
+        data: null 
+      });
+    }
 
-export { refreshToken };
+    // Function to generate the access token from the refresh token
+    const generateAccessToken = () => {
+      return jwt.sign({ userId: user.id, username: user.username }, process.env.ACCESS_TOKEN_SECRET, { 
+        expiresIn: '6h' 
+      });
+    };
+
+    const accessToken = generateAccessToken();
+
+    return res.status(200).json({ 
+      code: 200, 
+      success: true, 
+      error: null, 
+      message: "Access token generated successfully.", 
+      data: { 
+        id: user.id, 
+        username: user.username, 
+        accessToken
+      }});
+  } catch (error) {
+    console.error('Error generating the access token:', error);
+    return res.status(500).json({ 
+      code: 500, 
+      success: false, 
+      error: "Internal server error.", 
+      message: null, 
+      data: null 
+    });
+  }
+};

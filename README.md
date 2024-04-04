@@ -20,7 +20,7 @@ The Starter Backend project provides a foundation for building a Node.js backend
 - Node: [Node docs](https://nodejs.org/docs/latest/api/).
 - npm: [commands](https://www.npmjs.com/package/download).
 - JWT: [Introduction](https://jwt.io/introduction).
-- Zod: [Zod docs](https://zod.dev/)
+- Zod: [Zod docs](https://zod.dev/).
 - TypeScript: [typeScript docs](https://www.typescriptlang.org/docs/).
 
 ## Features
@@ -79,14 +79,14 @@ Let's go through each script and understand what it does:
 To execute any of these scripts, open your terminal or integrated terminal in Visual Studio Code, navigate to the project directory where the `package.json` file is located, and run the desired script using the `npm run` command followed by the script name.
 
 ## Routes URL's
-
-- 
-
-- 
-
-- 
-
-- `http://localhost:8001/api/v1/refresh`
+- Login url endpoint:
+- `http://localhost:8001/api/v1/login`
+- Logout url endpoint:
+- `http://localhost:8001/api/v1/logout`
+- Refesh access jwt url endpoint:
+- `http://localhost:8001/api/v1/refresh/"id"`
+- Register url endpoint:
+- `http://localhost:8001/api/v1/register`
 
 ## Folder Structure
 - `prisma/`: Directory containing the Prisma schema file defining the database structure.
