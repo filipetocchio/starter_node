@@ -5,12 +5,12 @@ import bcrypt from "bcrypt";
 import { AuthRouteResponse, RouteResponse } from "../interfaces/interfaces";
 import { ZodError } from "zod";
 
-
+// Function to register a new user
 const register = async (req: Request, res: Response) => {
   try {
-    const { username, password, email } = req.body;
+    const { username, password, email } = req.body; // Extract the username, password, and email from the request
 
-    // check for duplicate usernames in the db
+    // Check if there is a user with the same username or email in the database
     const duplicate = await prisma.user.findFirst({
       where: { OR: [{ username: username }, { email: email }] },
     });
@@ -32,7 +32,7 @@ const register = async (req: Request, res: Response) => {
       return;
     }
     
-    // Validate username
+    // Username validation
     if (username.length < 1) {
       const response: RouteResponse<null> = {
       code: 400,
@@ -56,7 +56,7 @@ const register = async (req: Request, res: Response) => {
       return;
     }
 
-    // validade password
+    // Password validation
     if (password.length < 6) {
       const response: RouteResponse<null> = {
       code: 400,
@@ -69,9 +69,10 @@ const register = async (req: Request, res: Response) => {
       return;
     }
 
+    // Encrypt the password
     const hashedPassword: string = await bcrypt.hash(password, 10);
 
-    // create access & refresh token
+    // Create access and refresh tokens
     const accessToken = jwt.sign({ UserInfo: { username: username } }, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "6h",
     });
@@ -79,7 +80,7 @@ const register = async (req: Request, res: Response) => {
       expiresIn: "1d",
     });
 
-    // store the new user
+    // Store the new user in the database
     const user = await prisma.user.create({
       data: {
         email: email,
@@ -89,6 +90,7 @@ const register = async (req: Request, res: Response) => {
       },
     });
 
+    // Set the cookie with the refresh token for the specified domain and path
     res.cookie("jwt", refreshToken, {
       domain: "http://localhost:4200",
       path: "/",
@@ -98,6 +100,7 @@ const register = async (req: Request, res: Response) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
+    // Return a success response with the access token and user information
     const response: RouteResponse<AuthRouteResponse> = {
       success: true,
       message: `New user ${username} created.`,
@@ -110,7 +113,7 @@ const register = async (req: Request, res: Response) => {
       },
     };
     
-    // send the access token back.
+    // Send the refresh token back to the client
     res
       .cookie("jwt", refreshToken, {
         httpOnly: true,
@@ -128,6 +131,7 @@ const register = async (req: Request, res: Response) => {
       error: "Internal server error.",
       message: "Internal server error.",
     };
+    // Handle Zod validation errors
     if (error instanceof ZodError) {
       response.code = 400;
       response.error = error.errors[0].message;
@@ -139,4 +143,4 @@ const register = async (req: Request, res: Response) => {
   }
 };
 
-export { register };
+export { register }; // Export the register function to be used in other files
