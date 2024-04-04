@@ -1,4 +1,3 @@
-// import whitelist
 import { allowedOrigins } from "../config/allowedOrigins";
 
 const credentials = (req, res, next) => {

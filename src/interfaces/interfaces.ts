@@ -1,6 +1,4 @@
-// *****************************************************
 // General structure of a response
-// *****************************************************
 
 export interface RouteResponse<T> {
   success: boolean;

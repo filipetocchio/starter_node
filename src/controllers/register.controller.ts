@@ -9,6 +9,7 @@ import { ZodError } from "zod";
 const register = async (req: Request, res: Response) => {
   try {
     const { username, password, email } = req.body;
+
     // check for duplicate usernames in the db
     const duplicate = await prisma.user.findFirst({
       where: { OR: [{ username: username }, { email: email }] },
@@ -108,6 +109,7 @@ const register = async (req: Request, res: Response) => {
         id: user.id,
       },
     };
+    
     // send the access token back.
     res
       .cookie("jwt", refreshToken, {

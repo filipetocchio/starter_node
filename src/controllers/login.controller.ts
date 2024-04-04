@@ -23,7 +23,6 @@ const login = async (req: Request, res: Response) => {
 
     // find the user
     const foundUser = await prisma.user.findFirst({ where: { username: username } });
-    console.log("findUsers:", foundUser);
     if (!foundUser) {
       const response: RouteResponse<null> = {
         code: 401,
@@ -34,13 +33,10 @@ const login = async (req: Request, res: Response) => {
       };
       return res.status(response.code).json(response);
     }
-    // check 
 
     const match = await bcrypt.compare(password, await bcrypt.hash(foundUser.password, 10));
-    console.log("match:", match);
     if (match) {
-      // create a jwt to send to use with the other routes that we want to
-      // be protected normal and refresh token.
+
       const accessToken = jwt.sign({ UserInfo: { username: foundUser.username } }, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "6h",
       });
@@ -56,14 +52,14 @@ const login = async (req: Request, res: Response) => {
       // save the new refresh token to the database
       await prisma.user.update({ where: { id: foundUser.id }, data: { refreshToken: refreshToken } });
 
-      // res.header("Access-Control-Allow-Credentials: true");
-      // res.header("Access-Control-Allow-Origin", "*");
-      // res.header("Access-Control-Allow-Headers", "*");
+      res.header("Access-Control-Allow-Credentials: true");
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Headers", "*");
 
       // saving refresh token with current user
       res.cookie("jwt", refreshToken, {
         httpOnly: true,
-        // sameSite: "lax",
+        sameSite: "lax",
         secure: true,
         maxAge: 24 * 60 * 60 * 1000,
       });
@@ -90,7 +86,6 @@ const login = async (req: Request, res: Response) => {
       return res.status(response.code).json(response);
     }
   } catch (error) {
-    console.error(error);
     const response: RouteResponse<null> = {
       code: 400,
       data: null,

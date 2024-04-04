@@ -9,7 +9,6 @@ const PORT = process.env.PORT || 8001;
 app.use(express.static(path.join(__dirname, "/public"))); // for serving static files
 app.use("/api/v1", apiV1Router);
 
-// maybe implement a catch all here
 app.get("/", (req, res) => {
   res.send("Hello nodejs!");
 });

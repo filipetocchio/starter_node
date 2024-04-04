@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 require("dotenv").config();
 
 const verifyJWT = (req, res, next) => {
-  const authHeader = req.headers["authorization"]; // make a check if it comes with capital A
+  const authHeader = req.headers["authorization"];
 
   if (!authHeader?.startsWith("Bearer ")) {
     return res.status(401).json({ message: "Unauthorized" });
